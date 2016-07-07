@@ -9,6 +9,14 @@
 
   <body>
     Testing AngularJS...
+    <!--
+    /**
+     * View in the sense of the MVC-pattern
+     */
+    -->
+    <div ng-app="flug">
+      <div ng-controller="FlugBuchenCtrl"></div>
+    </div>
   </body>
 
   <script>
@@ -22,7 +30,9 @@
     // Bereitstellung eines Moduls mit einem Controller:
     var app = angular.module('flug', []); // 'Modulname', [] mit zu importierenden Modulen // 'ng' is imported by default
 
-    // controller in the sense of the MVC-pattern - Will provide a model respectively a view-model
+    /**
+     * Controller in the sense of the MVC-pattern - will provide a model respectively a view-model
+     */
     // AngularJS treats parameters as dependendencies and calls them "Services"
     // Second param of app.controller() is the controller-constructorfunction (will provide a model-object to bind it to the view)
     app.controller('FlugBuchenCtrl', function($scope, $http) { // "wellknown names" (AngularJS will inject the dependencies)
@@ -36,6 +46,39 @@ debugger;
       // dedicated view-model vs. self-created view-model
       // $scope.vm = {... loadFluege: function() { ... } ...}; //
     });
+
+
+    /**
+     * Model respectively view-model.
+     */
+    function Flug(id, abflugort, zielort, datum) {
+      this.id = id;
+      this.abflugort = abflugort;
+      this.zielort = zielort;
+      this.datum = datum;
+    }
+
+    function FlugBuchenVM($http) {
+      var that = this;
+
+      this.fluege = [];
+
+      this.selectedFlug = null;
+
+      this.message = "";
+      this.flugNummerFilter = "";
+      this.flugVonFilter = "";
+      this.flugNachFilter = "";
+
+      this.loadFluege = function() {
+        that.fluege.push(new Flug(1, "Graz", "Essen", new Date()));
+        that.fluege.push(new Flug(2, "Graz", "Frankfurt", new Date()));
+      };
+
+      this.selectFlug = function(f) {
+        this.selectedFlug = f;
+      }
+    }
 
     console.log('...finished it.');
   </script>
