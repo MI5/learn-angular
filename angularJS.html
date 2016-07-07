@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <script src="../cpm-ui/jspm_packages/npm/angular@1.5.0/angular.js"></script>
+  </head>
+
+
+  <body>
+    Testing AngularJS...
+  </body>
+
+  <script>
+    console.log('Starting angular-stuff...');
+
+    // AngularJS strukturiert Anwendungen anhand von Modulen
+    // Ein Modul kapselt wiederverwendbare Programmteile und Konfigurationsinformationen
+    // Zu diesen Programmteilen zählen Controller im Sinne des MVC-Musters. Bei Controllern
+    // handelt es sich unter AngularJS um Einheiten, welche Models (bzw. View-Models) bereitstellen
+    // Eine View kümmert sich in weiterer Folge um deren Visualsierung.
+    // Bereitstellung eines Moduls mit einem Controller:
+    var app = angular.module('flug', []); // 'Modulname', [] mit zu importierenden Modulen
+
+    // AngularJS treats parameters as dependendencies and calls them "Services"
+    app.controller('FlugBuchenCtrl', function($scope, $http) { // "wellknown names" (AngularJS will inject the dependencies)
+        // List of "Services" (= dependencies = wellknown Names)
+        // 1) The $scope is the model of the MVC-pattern
+        // 2) $http allows accessing http resources the easy way
+
+debugger;
+      $scope.vm = new FlugBuchenVM($http);
+    });
+
+    console.log('...finished it.');
+  </script>
+</html>
