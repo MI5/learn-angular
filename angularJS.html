@@ -1,39 +1,89 @@
 <!DOCTYPE html>
 <html>
   <head>
+    <meta charset="utf-8">
     <title>Learning Angular</title>
-    <!--suppress JSUnresolvedLibraryURL -->
     <link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
+    <!--suppress JSUnresolvedLibraryURL -->
     <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.7/angular.min.js"></script>
   </head>
 
 
   <body>
-    <a href="https://docs.angularjs.org/api/" target="_blank">Learning AngularJS...</a>
+    <h5 style="text-align:right;padding-right:8px;"><a href="https://docs.angularjs.org/api/" target="_blank">Learning AngularJS</a></h5>
+
     <!--
     /**
      * View in the sense of the MVC-pattern
      */
     -->
-    <div ng-app="flug"> <!-- bind onto module via directive -->
-      <div ng-controller="FlugBuchenCtrl"></div> <!-- bind onto controller via directive -->
+    <div data-ng-app="flug"> <!-- Bind onto module via directive -->
+      <div data-ng-controller="FlugBuchenCtrl"> <!-- Bind onto controller via directive -->
+        <div class="container">
+
+          <h2>Flug auswählen</h2>
+          <div data-ng-show="vm.message" class="message">
+            {{ vm.message }}
+          </div>
+
+          <div class="form-group">
+            <label>Flugnummer</label>
+            <input data-ng-model="vm.flugNummerFilter" class="form-control" title="" />
+          </div>
+
+          <div class="form-group">
+            <label>Von</label>
+            <input data-ng-model="vm.flugVonFilter" class="form-control" title="" />
+          </div>
+
+          <div class="form-group">
+            <label>Nach</label>
+            <input data-ng-model="vm.flugNachFilter" class="form-control" title="" />
+          </div>
+
+          <div class="form-group">
+            <input type="button" value="Suchen" data-ng-click="vm.loadFluege()" class="btn" />
+          </div>
+
+          <div>
+            <table data-ng-show="vm.fluege.length > 0" class="table table-striped">
+              <tr>
+                <th>Id</th>
+                <th>Datum</th>
+                <th>Abflugort</th>
+                <th>Zielort</th>
+                <th>Aktion</th>
+              </tr>
+
+              <tr data-ng-repeat="f in vm.fluege" data-ng-class="{ info: f.id === vm.selectedFlug.id }">
+                <td>{{f.id}}</td>
+                <td>{{f.datum | date:'shortDate'}}</td>
+                <td>{{f.abflugort}}</td>
+                <td>{{f.zielort}}</td>
+                <td><a href="" data-ng-click="vm.slectFlug(f)">Auswählen</a></td>
+              </tr>
+            </table>
+          </div>
+
+        </div>
+      </div>
     </div>
     <!--
-      Known directives
-      ----------------
-      ng-app -> module
+      Known directives + explanation
+      ------------------------------
+      ng-app        -> module
       ng-controller
       ng-show
       ng-hide
-      ng-bind -> 1-way-databinding
-      ng-model -> 2-way-databinding
+      ng-bind       -> 1-way-databinding
+      ng-model      -> 2-way-databinding
       ng-click
       ng-change
       ng-blur
       ng-focus
       ng-checked
       ng-repeat
-      ng-class (css-class)
+      ng-class      -> css-class (depending on condition)
     -->
   </body>
 
@@ -58,7 +108,7 @@
         // 1) The $scope is the model of the MVC-pattern
         // 2) $http allows accessing http resources the easy way
 
-debugger;
+// debugger;
 
       // a controller will provide the (view-)model via its scope
       $scope.vm = new FlugBuchenVM($http); // vm = view-model
@@ -90,6 +140,7 @@ debugger;
       this.flugNachFilter = "";
 
       this.loadFluege = function() {
+        alert('I called loadFluege()!');
         that.fluege.push(new Flug(1, "Graz", "Essen", new Date()));
         that.fluege.push(new Flug(2, "Graz", "Frankfurt", new Date()));
       };
