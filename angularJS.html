@@ -90,10 +90,17 @@
       ng-checked
       ng-repeat
       ng-class      -> css-class (depending on condition)
+      ng-include    -> include a file via filename or an inline script tag via id
     -->
   </body>
 
   <script>
+    /**
+     * Known services
+     * --------------
+     * $scope, $http, $templateCache, $log
+     */
+
     // AngularJS strukturiert Anwendungen anhand von Modulen
     // Ein Modul kapselt wiederverwendbare Programmteile und Konfigurationsinformationen
     // Zu diesen Programmteilen zählen Controller im Sinne des MVC-Musters. Bei Controllern
@@ -206,11 +213,11 @@
               extraMsg =  ", " + result.data.message;
             }
             that.message = "Fehler: " + result.status + " " + result.statusText + extraMsg;
-          });
 
-        // Fallback if server is down:
-        // that.fluege.push(new Flug(1, "Graz", "Essen", new Date()));
-        // that.fluege.push(new Flug(2, "Graz", "Frankfurt", new Date()));
+            // Fallback if server is down:
+            that.fluege.push(new Flug(1, "Graz", "Essen", new Date()));
+            that.fluege.push(new Flug(2, "Graz", "Frankfurt", new Date()));
+          });
       };
 
       this.selectFlug = function(f) {
@@ -221,6 +228,9 @@
     /**
      * Further pro-tips
      * 1) enable one-time-binding with :: e. g.: <h1>{{::model.title}}</h1>
+     * 2) Send an event: $rootScope.$broadcast("xxx", 123); // sendet an untergeordnete scopes
+     * 3) Send an event: $rootScope.$emit("xxx", 123); // sendet an übergeordnete scopes
+     * 4) Listen to an event: $scope.$on("xxx", function(e, arg) {});
      */
   </script>
 </html>
