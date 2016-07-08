@@ -19,6 +19,12 @@
     -->
     <div data-ng-app="flug"> <!-- Bind onto module via directive -->
       <div data-ng-controller="FlugBuchenCtrl"> <!-- Bind onto controller via directive -->
+        <!-- Besides via attribute, directives also can be bound via tag, class or even comment
+          example tag      : <my-dir></my-dir>
+          example attribute: <span my-dir="exp"></span> // Most wideley used
+          example comment  : <!-- directive: my-dir exp -- >
+          example class    : <span class="my-dir: exp;"></span>
+        -->
         <div class="container">
 
           <h2>Flug auswählen</h2>
@@ -57,7 +63,7 @@
 
               <tr data-ng-repeat="f in vm.fluege" data-ng-class="{ info: f.id === vm.selectedFlug.id }">
                 <td>{{f.id}}</td>
-                <td>{{f.datum | date:'shortDate'}}</td>
+                <td>{{f.datum | date:'shortDate'}}</td> <!-- After pipe: filter -->
                 <td>{{f.abflugort}}</td>
                 <td>{{f.zielort}}</td>
                 <td><a href="" data-ng-click="vm.slectFlug(f)">Auswählen</a></td>
@@ -99,11 +105,17 @@
     var app = angular.module('flug', []); // 'Modulname', [] mit zu importierenden Modulen // 'ng' is imported by default
 
     /**
+     * Add a constant to the app
+     */
+    app.constant("baseUrl", "http://www.angular.at/api/flug");
+
+
+    /**
      * Controller in the sense of the MVC-pattern - will provide a model respectively a view-model
      */
     // AngularJS treats parameters as dependendencies and calls them "Services"
     // Second param of app.controller() is the controller-constructorfunction (will provide a model-object to bind it to the view)
-    app.controller('FlugBuchenCtrl', function($scope, $http) { // "wellknown names" (AngularJS will inject the dependencies)
+    app.controller('FlugBuchenCtrl', function($scope, $http, baseUrl) { // "wellknown names" (AngularJS will inject the dependencies)
         // List of "Services" (= dependencies = wellknown Names)
         // 1) The $scope is the model of the MVC-pattern
         // 2) $http allows accessing http resources the easy way
@@ -111,9 +123,16 @@
 // debugger;
 
       // a controller will provide the (view-)model via its scope
-      $scope.vm = new FlugBuchenVM($http); // vm = view-model
+      $scope.vm = new FlugBuchenVM($http, baseUrl); // vm = view-model
       // dedicated view-model vs. self-created view-model
       // $scope.vm = {... loadFluege: function() { ... } ...}; //
+
+
+      // Refresh databinding manually - unnecessary as long as angular-services like $http are used
+      // $scope.$digest();
+
+      // Watch objects
+      // $scope.$watch('preis', function(newValue, oldValue) {console.log(newValue, oldValue);} );
     });
     // vs. model-view-viewmodel with controller as
     // app.controller('FlugBuchenCtrl', FlugBuchenVM); // and // <div ng-controller="FlugBuchenVM as vm">
@@ -128,7 +147,7 @@
       this.datum = datum;
     }
 
-    function FlugBuchenVM($http) {
+    function FlugBuchenVM($http, baseUrl) {
       var that = this;
 
       this.fluege = [];
@@ -140,16 +159,51 @@
       this.flugVonFilter = "";
       this.flugNachFilter = "";
 
+      //noinspection JSUnusedGlobalSymbols
       this.loadFluege = function() {
-        alert('I called loadFluege()!');
-        that.fluege.push(new Flug(1, "Graz", "Essen", new Date()));
-        that.fluege.push(new Flug(2, "Graz", "Frankfurt", new Date()));
+        var params = {};
+
+        if (that.flugNummerFilter) {
+          params = {
+            flugNummer: that.flugNummerFilter
+          };
+        } else {
+          params = {
+            abflugOrt: that.flugVonFilter,
+            zielOrt: that.flugNachFilter
+          };
+        }
+
+        $http.get(baseUrl, { params : params})
+          .then(function(result) {
+            if (angular.isArray(result.data)) {
+              that.fluege = result.data;
+            } else {
+              that.fluege = [result.data]
+            }
+          })
+          .catch(function(/** @type {{data}} */result) {
+            var extraMsg;
+            if (result.data && result.data.message) {
+              extraMsg =  ", " + result.data.message;
+            }
+            that.message = "Fehler: " + result.status + " " + result.statusText + extraMsg;
+          });
+
+        // Fallback if server is down:
+        // that.fluege.push(new Flug(1, "Graz", "Essen", new Date()));
+        // that.fluege.push(new Flug(2, "Graz", "Frankfurt", new Date()));
       };
 
       this.selectFlug = function(f) {
-        this.selectedFlug = f;
+        that.selectedFlug = f;
       }
     }
+
+    /**
+     * Further pro-tips
+     * 1) enable one-time-binding with :: e. g.: <h1>{{::model.title}}</h1>
+     */
 
     console.log('...finished it.');
   </script>
