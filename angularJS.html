@@ -94,8 +94,6 @@
   </body>
 
   <script>
-    console.log('Starting angular-stuff...');
-
     // AngularJS strukturiert Anwendungen anhand von Modulen
     // Ein Modul kapselt wiederverwendbare Programmteile und Konfigurationsinformationen
     // Zu diesen Programmteilen zählen Controller im Sinne des MVC-Musters. Bei Controllern
@@ -105,9 +103,29 @@
     var app = angular.module('flug', []); // 'Modulname', [] mit zu importierenden Modulen // 'ng' is imported by default
 
     /**
-     * Add a constant to the app
+     * Add a (fixed) constant to the app
      */
     app.constant("baseUrl", "http://www.angular.at/api/flug");
+
+    /**
+     * Add a (changeable) value to the app
+     */
+    app.value("myValue", { userId:4711, userName: "Susi"});
+
+    /**
+     * Add a configuration to the app
+     */
+    app.config(function($logProvider) { // = configuration-function // can only request service-providers
+      $logProvider.debugEnabled(false);
+    });
+
+    /**
+     * Add a initialisation-function to the app
+     */
+    app.run(function($log) { // = initialisation-function // can request services (but not a scope)
+      $log.debug('Debug messages are enabled');
+      $log.info('App started');
+    });
 
 
     /**
@@ -204,7 +222,5 @@
      * Further pro-tips
      * 1) enable one-time-binding with :: e. g.: <h1>{{::model.title}}</h1>
      */
-
-    console.log('...finished it.');
   </script>
 </html>
