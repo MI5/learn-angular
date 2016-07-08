@@ -3,20 +3,38 @@
   <head>
     <title>Learning Angular</title>
     <!--suppress JSUnresolvedLibraryURL -->
+    <link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
     <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.7/angular.min.js"></script>
   </head>
 
 
   <body>
-    Testing AngularJS...
+    <a href="https://docs.angularjs.org/api/" target="_blank">Learning AngularJS...</a>
     <!--
     /**
      * View in the sense of the MVC-pattern
      */
     -->
-    <div ng-app="flug">
-      <div ng-controller="FlugBuchenCtrl"></div>
+    <div ng-app="flug"> <!-- bind onto module via directive -->
+      <div ng-controller="FlugBuchenCtrl"></div> <!-- bind onto controller via directive -->
     </div>
+    <!--
+      Known directives
+      ----------------
+      ng-app -> module
+      ng-controller
+      ng-show
+      ng-hide
+      ng-bind -> 1-way-databinding
+      ng-model -> 2-way-databinding
+      ng-click
+      ng-change
+      ng-blur
+      ng-focus
+      ng-checked
+      ng-repeat
+      ng-class (css-class)
+    -->
   </body>
 
   <script>
@@ -42,6 +60,7 @@
 
 debugger;
 
+      // a controller will provide the (view-)model via its scope
       $scope.vm = new FlugBuchenVM($http); // vm = view-model
       // dedicated view-model vs. self-created view-model
       // $scope.vm = {... loadFluege: function() { ... } ...}; //
