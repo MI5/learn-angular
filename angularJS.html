@@ -123,16 +123,19 @@
     /**
      * Add a configuration to the app
      */
-    app.config(function($logProvider) { // = configuration-function // can only request service-providers
+    app.config(function($logProvider, $httpProvider) { // = configuration-function // can only request service-providers
       $logProvider.debugEnabled(false);
+      $httpProvider.defaults.headers.common["X-API-Version"] = 1.12; // set a header via $httpProvider in config or...
     });
 
     /**
      * Add a initialisation-function to the app
      */
-    app.run(function($log) { // = initialisation-function // can request services (but not a scope)
+    app.run(function($log, $http) { // = initialisation-function // can request services (but not a scope)
       $log.debug('Debug messages are enabled');
       $log.info('App started');
+
+      $http.defaults.headers.get = {"X-API-Version": "1.13"}; // ...set a header via $http
     });
 
 
