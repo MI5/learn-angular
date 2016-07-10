@@ -10,10 +10,33 @@
   <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.7/angular.min.js"></script>
   <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.7/angular-resource.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.5.7/angular-mocks.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.13.1/lodash.min.js"></script>
 </head>
 
 
-<body>
+<body data-ng-app="ngResourceDemo" data-ng-controller="MainCtrl">
+  <nav>
+    <button data-ng-click="service.addNewTicket()">Neues Ticket anlegen</button>
+    <button data-ng-click="service.loadAllTickets()">Alle Tickets laden</button>
+    <div>
+      <input type="text" data-ng-model="ticketToSearch" title="" />
+      <button data-ng-click="service.loadTicketById(ticketToSearch)">Lade Ticket</button>
+    </div>
+  </nav>
+
+  <div class="ticket" data-ng-repeat="ticket in service.getTickets()">
+    <button data-ng-click="service.saveTicket(ticket)">Speichern</button>
+    <button data-ng-click="service.deleteTicket(ticket)">Löschen</button>
+    <h3>({{ticket.id}}) <input data-ng-model="ticket.title" title="" /></h3>
+    <span class="assigned-to">
+      Zugeordnet zu: <input data-ng-model="ticket.assignedTo" title="" />
+    </span>
+    <span class="percentage-complete">
+      Erledigt %: <input data-ng-model="ticket.percentageComplete" title="" />
+    </span><br />
+    <textarea data-ng-model="ticket.description" class="description" title=""></textarea>
+  </div>
+
 </body>
 <script>
   "use strict";
@@ -30,7 +53,7 @@
     var tickets = [];
 
     var loadAllTickets = function() {
-      TicketResource.query(function() {
+      TicketResource.query(function(data) {
         tickets = data;
       });
     };
@@ -67,7 +90,7 @@
 
     var deleteTicket = function(ticket) {
       TicketResource.delete({id:ticket.id}, function() {
-        var pos = _.indexOf(_.pluck(tickets, 'id'), ticket.id);
+        var pos = _.indexOf(_.map(tickets, 'id'), ticket.id);
         tickets.splice(pos, 1);
       });
     };
@@ -118,7 +141,7 @@
     $httpBackend.whenGET({ test: function(url) { return regexGetTicket.test(url)}}).respond(function(method, url) {
       var id = url.match(regexGetTicket)[1];
       var match = _.find(tickets, function(t) {
-        return t.id = id;
+        return t.id === id;
       });
 
       return match === undefined ? [404, 'Not found'] : [200, match];
@@ -153,7 +176,7 @@
         return t.id === id;
       });
 
-      var pos = _.indexOf(_.pluck(tickets, 'id'), id);
+      var pos = _.indexOf(_.map(tickets, 'id'), id);
       tickets.splice(pos, 1);
 
       return match === undefined ? [404, 'Not found'] : [200, match];
