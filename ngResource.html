@@ -19,6 +19,74 @@
   "use strict";
 
   var app = angular.module('ngResourceDemo', ['ngResource', 'ngMockE2E']); // use existing modules
+
+  app.constant('baseUrl', '/ticket/:id');
+
+  app.factory('TicketService', function($resource, baseUrl) {
+    // den $resource-Service initialisieren
+    var TicketResource = $resource(baseUrl);
+
+    // Ticket-Container für bereits geladene Tickets
+    var tickets = [];
+
+    var loadAllTickets = function() {
+      TicketResource.query(function() {
+        tickets = data;
+      });
+    };
+
+    var loadTicketById = function(id) {
+      if (!id || !angular.isNumber(parseInt(id, 10))) {
+        return;
+      }
+
+      // Alternatives Beispiel: Zugriff auf das Promise des zugrundeliegenden $http-Services
+      TicketResource.get({id: id}).$promise.then(function(ticket) {
+        tickets = [ticket];
+      });
+    };
+
+    // weird stuff - using $save on ticket?!
+    var saveTicket = function(ticket) {
+      ticket.$save();
+    };
+
+    var addNewTicket = function() {
+      var newTicket = new TicketResource({
+        id: 0,
+        title: 'Neues Ticket',
+        assignedTo: 'Niemand',
+        description: 'Ticket Nachricht hier einfügen',
+        percentageComplete: 0
+      });
+
+      newTicket.$save(function(repliedTicket) {
+        tickets.unshift(repliedTicket);
+      });
+    };
+
+    var deleteTicket = function(ticket) {
+      TicketResource.delete({id:ticket.id}, function() {
+        var pos = _.indexOf(_.pluck(tickets, 'id'), ticket.id);
+        tickets.splice(pos, 1);
+      });
+    };
+
+
+    // Revealing Module Pattern
+    return {
+      getTickets: function() {
+        return tickets;
+      },
+      loadAllTickets: loadAllTickets,
+      loadTicketById: loadTicketById,
+      saveTicket: saveTicket,
+      addNewTicket: addNewTicket,
+      deleteTicket: deleteTicket
+    };
+  });
+
+
   app.run(function($httpBackend) {
     // Beispielhafte Ticket-Entität
     var ticket = function(id,title,assignedTo,description,percentageComplete) {
@@ -93,6 +161,13 @@
 
     console.log('Backend-Attrape aktiv!');
   });
+
+
+  app.controller('MainCtrl', function($scope, TicketService) {
+    $scope.service = TicketService;
+    $scope.ticketToSearch = '';
+  });
+
 
   console.log('through');
 </script>
