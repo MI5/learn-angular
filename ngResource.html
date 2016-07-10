@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<!--suppress JSUnusedGlobalSymbols -->
+<!--suppress JSUnresolvedLibraryURL -->
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Learning Angular - Backend-lose Entwicklung mit ngMockE2E</title>
+  <link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
+
+  <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.7/angular.min.js"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.7/angular-resource.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.5.7/angular-mocks.js"></script>
+</head>
+
+
+<body>
+</body>
+<script>
+  "use strict";
+
+  var app = angular.module('ngResourceDemo', ['ngResource', 'ngMockE2E']); // use existing modules
+  app.run(function($httpBackend) {
+    // Beispielhafte Ticket-Entität
+    var ticket = function(id,title,assignedTo,description,percentageComplete) {
+      this.id = id;
+      this.title = title;
+      this.assignedTo = assignedTo;
+      this.description = description;
+      this.percentageComplete = percentageComplete;
+    };
+
+    // Exemplarische Datenbank mit Sammlung von Tickets
+    var tickets = [
+      new ticket('1','Fehlende Exception','Max Mustermann','Methode x liefert keine Exception im Fehlerfall Z', 0),
+      new ticket('2','Ticket-Service einbinden','Max Mustermann','Fehler sollen im Ticket-service protokolliert werden', 0),
+      new ticket('3','AngularJS updaten','Max Mustermann','Es soll auf die Version 1.5.7 aktualisiert werden', 0),
+      new ticket('4','Rahmen fehlt','Susi Sorglos','Das div.demo hat keine border definiert', 0),
+      new ticket('5','Responsive Grid einführen','Susi Sorglos','Die Applikation sollte ein Responsive Grid verwenden', 0)
+    ];
+
+    // Regex-Ausdruck um auf das Vorhandensein des ID Parameters abzuprüfen
+    var regexGetTicket = new RegExp('/ticket/([0-9]+)');
+
+    // Alle Tickets retournieren
+    // GET: /ticket
+    $httpBackend.whenGET('/ticket').respond(tickets);
+  });
+
+  console.log('through');
+</script>
+</html>
