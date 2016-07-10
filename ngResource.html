@@ -4,7 +4,7 @@
 <html>
 <head>
   <meta charset="utf-8">
-  <title>Learning Angular - Backend-lose Entwicklung mit ngMockE2E</title>
+  <title>Backend-lose Entwicklung mit ngMockE2E</title>
   <link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
 
   <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.7/angular.min.js"></script>
@@ -41,9 +41,57 @@
     // Regex-Ausdruck um auf das Vorhandensein des ID Parameters abzuprüfen
     var regexGetTicket = new RegExp('/ticket/([0-9]+)');
 
-    // Alle Tickets retournieren
+    // REST-Endpoint 1: Alle Tickets retournieren
     // GET: /ticket
     $httpBackend.whenGET('/ticket').respond(tickets);
+
+    // REST-Endpoint 2: Ein Ticket mittels übereinstimmender ID retournieren
+    // GET: /ticket/:id
+    $httpBackend.whenGET({ test: function(url) { return regexGetTicket.test(url)}}).respond(function(method, url) {
+      var id = url.match(regexGetTicket)[1];
+      var match = _.find(tickets, function(t) {
+        return t.id = id;
+      });
+
+      return match === undefined ? [404, 'Not found'] : [200, match];
+    });
+
+    // REST-Endpoint 3: Hinzufügen oder Überschreiben eines Tickets
+    // POST: /ticket
+    $httpBackend.whenPOST('/ticket').respond(function(method, url, data) {
+      var newTicket = angular.fromJson(data);
+      var existingTicket = _.find(tickets, function(t) {
+        return t.id === newTicket.id;
+      });
+
+      if (existingTicket) {
+        _.extend(existingTicket, newTicket);
+        return [200, existingTicket, {}];
+      } else {
+        newTicket.id = parseInt(_.max(tickets, function(t) {
+          return t.id;
+        }).id || 0, 10) + 1 + '';
+      }
+
+      tickets.push(newTicket);
+      return [200, newTicket];
+    });
+
+    // REST-Endpoint 4: Löschen eines Tickets
+    // DELETE: /ticket/:id
+    $httpBackend.whenDELETE({test: function(url) { return regexGetTicket.test(url); }}).respond(function(method, url) {
+      var id = url.match(regexGetTicket)[1];
+      var match = _.find(tickets, function(t) {
+        return t.id === id;
+      });
+
+      var pos = _.indexOf(_.pluck(tickets, 'id'), id);
+      tickets.splice(pos, 1);
+
+      return match === undefined ? [404, 'Not found'] : [200, match];
+    });
+
+    console.log('Backend-Attrape aktiv!');
   });
 
   console.log('through');
