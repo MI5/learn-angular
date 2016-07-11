@@ -160,7 +160,8 @@
 
 
       // Refresh databinding manually - unnecessary as long as angular-services like $http are used
-      // $scope.$digest();
+      // $scope.$digest(); // Current scope and all sub scopes
+      // $scope.$apply(); // All scopes
 
       // Watch objects
       // $scope.$watch('preis', function(newValue, oldValue) {console.log(newValue, oldValue);} );
